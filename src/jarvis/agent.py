@@ -88,8 +88,9 @@ class Agent:
         tool_results = []
         for tool_call in msg.tool_calls:
             fn_name = tool_call.function.name
-            fn_args = json.loads(tool_call.function.arguments)
-
+            raw_args = tool_call.function.arguments
+            fn_args = json.loads(raw_args) if raw_args and raw_args.strip() else {}
+            
             logger.info(f"Tool → {fn_name}({fn_args})")
 
             # Execute via registry (never raises — always returns string)

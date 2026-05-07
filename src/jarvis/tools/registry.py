@@ -52,7 +52,9 @@ class ToolRegistry:
         fn = getattr(instance, method_name)
 
         try:
-            result = fn(**kwargs)
+            # Ensure kwargs is always a dict even if something went wrong in the caller
+            args = kwargs if isinstance(kwargs, dict) else {}
+            result = fn(**args)
             return str(result)
         except Exception as e:
             logger.error(f"Tool '{name}' crashed: {e}")

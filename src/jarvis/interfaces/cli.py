@@ -14,11 +14,11 @@ from loguru import logger
 
 
 BANNER = """
-╔══════════════════════════════════════════════╗
-║   JARVIS — AI Automation System              ║
-║   Model : llama-3.3-70b (Groq)              ║
-║   Type  : /help for commands, exit to quit   ║
-╚══════════════════════════════════════════════╝
++----------------------------------------------+
+|   JARVIS - AI Automation System              |
+|   Model : llama-3.3-70b (Groq)              |
+|   Type  : /help for commands, exit to quit   |
++----------------------------------------------+
 """
 
 HELP_TEXT = """
