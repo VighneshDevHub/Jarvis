@@ -54,11 +54,26 @@ def register_tools():
       2. Add it here.
     """
     from .tools.registry import registry
+
+    # Phase 1
     from .tools.system import SystemTool
-
     registry.register(SystemTool())
-    logger.info(f"Tools registered: {registry.list_tools()}")
 
+    # Phase 2
+    from .tools.browser import BrowserTool
+    registry.register(BrowserTool())
+
+    from .tools.search import SearchTool
+    registry.register(SearchTool())
+
+    from .tools.code import CodeTool
+    registry.register(CodeTool())
+
+    # Phase 3 - uncomment when built
+    # from .tools.voice import VoiceTool
+    # registry.register(VoiceTool())
+
+    logger.info(f"Tools registered: {registry.list_tools()}")
 
 def main():
     parser = argparse.ArgumentParser(description="JARVIS AI Automation System")
