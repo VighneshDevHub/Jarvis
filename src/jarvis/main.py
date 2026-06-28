@@ -10,9 +10,9 @@
 #   5. Launches the chosen interface
 #
 # Run with:
-#   python -m src.jarvis.main
+#   python -m src.jarvis.main              (text mode)
+#   python -m src.jarvis.main --voice      (voice mode)
 #   python -m src.jarvis.main --mode cli   (default)
-#   python -m src.jarvis.main --mode gui   (Phase 5)
 # ============================================
 
 import sys
@@ -23,7 +23,6 @@ from loguru import logger
 
 def setup_logging(log_level: str):
     """Configure loguru: pretty console output + rotating file."""
-    # Remove the default handler
     logger.remove()
 
     # Console: clean, coloured, INFO and above
@@ -48,18 +47,18 @@ def setup_logging(log_level: str):
 
 def register_tools():
     """
-    Import and register every tool module.
-    To add a new tool in future phases:
+    Register every tool module here.
+    To add a new tool:
       1. Create src/jarvis/tools/your_tool.py
-      2. Add it here.
+      2. Import and register it below.
     """
     from .tools.registry import registry
 
-    # Phase 1
+    # Phase 1 — system control
     from .tools.system import SystemTool
     registry.register(SystemTool())
 
-    # Phase 2
+    # Phase 2 — browser, search, code
     from .tools.browser import BrowserTool
     registry.register(BrowserTool())
 
@@ -69,11 +68,17 @@ def register_tools():
     from .tools.code import CodeTool
     registry.register(CodeTool())
 
-    # Phase 3 - uncomment when built
-    # from .tools.voice import VoiceTool
-    # registry.register(VoiceTool())
+    # Phase 3 — voice
+    from .tools.voice import VoiceTool
+    registry.register(VoiceTool())
+
+    # Phase 4 — uncomment when built
+    # from .memory.long_term import LongTermMemory
+    # Phase 5 — uncomment when built
+    # from .tools.email_tool import EmailTool
 
     logger.info(f"Tools registered: {registry.list_tools()}")
+
 
 def main():
     parser = argparse.ArgumentParser(description="JARVIS AI Automation System")
@@ -83,39 +88,45 @@ def main():
         default="cli",
         help="Interface to launch (default: cli)",
     )
+    parser.add_argument(
+        "--voice",
+        action="store_true",
+        help="Start with voice mode enabled",
+    )
     args = parser.parse_args()
 
-    # 1. Load config (crashes with a clear error if .env is missing keys)
+    # 1. Load config
     from .config import settings
     setup_logging(settings.jarvis_log_level)
 
     logger.info("=" * 50)
     logger.info("JARVIS starting up")
     logger.info(f"Mode   : {args.mode}")
+    logger.info(f"Voice  : {args.voice}")
     logger.info(f"Model  : {settings.jarvis_model}")
     logger.info("=" * 50)
 
-    # 2. Register tools
+    # 2. Register all tools
     register_tools()
 
-    # 3. Create agent
+    # 3. Create the agent
     from .agent import Agent
     agent = Agent()
 
     # 4. Launch interface
     if args.mode == "cli":
         from .interfaces.cli import run_cli
-        run_cli(agent)
+        run_cli(agent, voice_mode=args.voice)
 
     elif args.mode == "gui":
-        logger.warning("GUI not available yet — launching CLI instead. (Build in Phase 5)")
+        logger.warning("GUI not built yet — launching CLI. (Phase 5)")
         from .interfaces.cli import run_cli
-        run_cli(agent)
+        run_cli(agent, voice_mode=args.voice)
 
     elif args.mode == "tray":
-        logger.warning("Tray not available yet — launching CLI instead. (Build in Phase 5)")
+        logger.warning("Tray not built yet — launching CLI. (Phase 5)")
         from .interfaces.cli import run_cli
-        run_cli(agent)
+        run_cli(agent, voice_mode=args.voice)
 
 
 if __name__ == "__main__":
